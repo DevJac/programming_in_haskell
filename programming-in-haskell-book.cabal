@@ -1,0 +1,29 @@
+name:                   programming-in-haskell-book
+version:                0.1.0.0
+build-type:             Simple
+cabal-version:          >=1.10
+
+executable programming-in-haskell-book
+  hs-source-dirs:       src
+  main-is:              Main.hs
+  default-language:     Haskell2010
+  ghc-options:          -threaded
+                        -Werror
+                        -Wall
+                        -Wcompat
+                        -Wnoncanonical-monad-instances
+                        -Wnoncanonical-monadfail-instances
+                        -fdefer-typed-holes
+                        -fno-warn-missing-signatures
+                        -fno-warn-partial-type-signatures
+  default-extensions:   BangPatterns
+                        LambdaCase
+                        MultiWayIf
+                        NoMonomorphismRestriction
+                        OverloadedStrings
+                        PartialTypeSignatures
+                        PatternGuards
+                        ScopedTypeVariables
+                        TypeApplications
+                        ViewPatterns
+  build-depends:        base
