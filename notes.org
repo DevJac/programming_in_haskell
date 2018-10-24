@@ -31,6 +31,8 @@ The ! option turns type errors into warnings, thus allowing you to work on parti
 :reload reloads the last :loaded module, and also supports the ! option.
 *** :main <args> / :run <args>
 Runs the main function with the given command line args.
+*** :type <expression>
+Show the type of the given expression.
 ** it variable
 The it variable contains the result of the last expression.
 ** .ghci file
