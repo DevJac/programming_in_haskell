@@ -6,16 +6,29 @@ Disables type default warnings.
 Lists set options and flags.
 *** :show modules
 List loaded modules.
-*** :! command
-Run a command outside of GHCI.
 *** :set +m
 Set smart multi-line mode.
 *** :set +t
 Display the type(s) of every statement.
 *** :set +s
 Display timing and memory usage statistics after every statement.
-** :{ ... :} multi-line syntax
+** : commands
+*** :! command
+Run a command outside of GHCI.
+*** :{ ... :} multi-line syntax
 :{ and :} are the multi-line tags. You might also use :set +m to enable smart multi-line mode.
+*** :edit <file>
+Opens the file in the configured editor. If file is omitted, it will open the most recently loaded module.
+*** :browse <module>
+Lists identifiers exported by the given module.
+*** :load[!] [*]<module> / :reload[!]
+Loads a module or filename, and forgets all previously loaded modules. If not given a module or filename, all modules will be forgotten.
+
+The * option forces the module to be loaded as byte-code.
+
+The ! option turns type errors into warnings, thus allowing you to work on partially complete modules.
+
+:reload reloads the last :loaded module, and also supports the ! option.
 ** it variable
 The it variable contains the result of the last expression.
 ** .ghci file
