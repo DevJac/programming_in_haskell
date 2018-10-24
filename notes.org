@@ -29,6 +29,8 @@ The * option forces the module to be loaded as byte-code.
 The ! option turns type errors into warnings, thus allowing you to work on partially complete modules.
 
 :reload reloads the last :loaded module, and also supports the ! option.
+*** :main <args> / :run <args>
+Runs the main function with the given command line args.
 ** it variable
 The it variable contains the result of the last expression.
 ** .ghci file
