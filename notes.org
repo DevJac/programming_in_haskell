@@ -1,0 +1,33 @@
+* GHCI
+** :set examples
+*** :set -Wno-type-defaults
+Disables type default warnings.
+*** :show
+Lists set options and flags.
+*** :show modules
+List loaded modules.
+*** :! command
+Run a command outside of GHCI.
+*** :set +m
+Set smart multi-line mode.
+*** :set +t
+Display the type(s) of every statement.
+*** :set +s
+Display timing and memory usage statistics after every statement.
+** :{ ... :} multi-line syntax
+:{ and :} are the multi-line tags. You might also use :set +m to enable smart multi-line mode.
+** it variable
+The it variable contains the result of the last expression.
+** .ghci file
+When GHCI starts, it will run commands in the ./.ghci file, $HOME/.ghc/ghci.conf, and $HOME/.ghci files. These files can be used to set commonly used settings and flags automatically.
+* Notes
+** functional vs imperative programming
+Functional programming is a *style* of programming in which the *application of functions* is fundamental. A functional programming language is a programming language that encourages that *style*.
+
+Imperative programming is a *style* of programming in which *storing and changing values* is fundamental. An imperative programming language is a programming language that encourages that *style*.
+*** Example
+How would you sum the list of integers from 1 to 100?
+
+Using a functional style, you might call a function to create the list, and then apply another function to sum the elements of that list.
+
+Using an imperative style, you might create a couple variables (like step and total) and then use a loop to step one variable from 1 to 100 while keeping a running total in another variable.
