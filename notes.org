@@ -76,6 +76,12 @@ There may be multiple base cases. To find base cases, start listing conditions w
 First, make a recursive function work for a specific case (or a specific type); try the simplest case. Afterwards, it might be worthwhile it generalize the function.
 
 "Defining recursive functions is like riding a bicycle: it looks easy when someone else is doing it, may seem impossible when you first try to do it yourself, but becomes simple and natural with practice."
+** folds
+foldr or "fold right" can be thought of as folding a function from right to left over a list, or as replacing all the cons in a list with a right associative operation. Likewise for foldl or "fold left".
+
+Remember that cons (:) is right associative, and thus foldr is a corollary to lists.
+
+foldr and foldl are easily swapped for associative operations. The difference between the two is most prominent for non-associative operations.
 * Project Ideas
 ** Attempt to solve any given substitution cipher
 This should be possible using letter frequencies and a dictionary.
