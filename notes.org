@@ -68,3 +68,6 @@ a^2 + b^2 == c^2 is an example of a guard.
 Note that generator variables can be used in later generators and guards.
 
 The generators behave like nested loops, with the latter generators "iterating faster" than the earlier generators.
+* Project Ideas
+** Attempt to solve any given substitution cipher
+This should be possible using letter frequencies and a dictionary.
