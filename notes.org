@@ -48,3 +48,23 @@ How would you sum the list of integers from 1 to 100?
 Using a functional style, you might call a function to create the list, and then apply another function to sum the elements of that list.
 
 Using an imperative style, you might create a couple variables (like step and total) and then use a loop to step one variable from 1 to 100 while keeping a running total in another variable.
+** pattern matching and guards
+Guards are something I haven't used much. I wasn't 100% comfortable with how they interacted with pattern matching. I created this odd function to demonstrate their interaction:
+
+foo [1, a, b] | a > b     = True
+              | otherwise = False
+foo [2, a, b] | a < b     = True
+              | otherwise = False
+foo _ = False
+** list comprehensions
+List comprehensions are something I haven't used much. Here is a good example:
+
+pythagoreanTriples n = [ (a, b, c) | a <- [1..n], b <- [a..n], c <- [b..n], a^2 + b^2 == c^2 ]
+
+a <- [1..n] is an example of a generator.
+
+a^2 + b^2 == c^2 is an example of a guard.
+
+Note that generator variables can be used in later generators and guards.
+
+The generators behave like nested loops, with the latter generators "iterating faster" than the earlier generators.
