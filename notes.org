@@ -68,6 +68,16 @@ a^2 + b^2 == c^2 is an example of a guard.
 Note that generator variables can be used in later generators and guards.
 
 The generators behave like nested loops, with the latter generators "iterating faster" than the earlier generators.
+** recursion
+A general tip for recursive functions: Identify a "base case" and a "recursive case"; the recursive call (of the recursive case) should move ever closer to the base case, and the base case should end the recursion.
+
+There may be multiple base cases. To find base cases, start listing conditions where you already know the answer. It's OK to have extra bases cases, but you may want to eventually remove extra bases cases for clarity. The more base cases you have, the more targets you have to move your recursive calls towards.
+
+First, make a recursive function work for a specific case (or a specific type); try the simplest case. Afterwards, it might be worthwhile it generalize the function.
+
+"Defining recursive functions is like riding a bicycle: it looks easy when someone else is doing it, may seem impossible when you first try to do it yourself, but becomes simple and natural with practice."
 * Project Ideas
 ** Attempt to solve any given substitution cipher
 This should be possible using letter frequencies and a dictionary.
+** Visualize different sorting algorithms using raylib
+Once I've finished my raylib bindings, use it to visualize different sorting algorithms.
