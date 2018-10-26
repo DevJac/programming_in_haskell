@@ -6,6 +6,7 @@ cabal-version:          >=1.10
 executable programming-in-haskell-book
   hs-source-dirs:       src
   main-is:              Main.hs
+  other-modules:        Countdown
   default-language:     Haskell2010
   ghc-options:          -threaded
                         -Werror
