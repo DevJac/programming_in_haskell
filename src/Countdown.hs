@@ -25,6 +25,7 @@ valid Sub x y = x > y
 valid Mul x y = x /= 1 && y /= 1
 valid Div x y = y /= 1 && x `mod` y == 0
 
+-- I'm not super confident this normalizes every equation form.
 validExpr :: Expr -> Bool
 validExpr (Val _) = True
 -- No (e + 1), instead do (1 + e).
@@ -40,6 +41,8 @@ validExpr (App Add (Val l) (Val r)) | l > r = False
 validExpr (App Mul (Val l) (Val r)) | l > r = False
 validExpr (App Add (Val a) (App Add (Val b) _)) | a > b = False
 validExpr (App Mul (Val a) (App Mul (Val b) _)) | a > b = False
+validExpr (App Add (App _ (Val a) _) (App _ (Val b) _)) | a > b = False
+validExpr (App Mul (App _ (Val a) _) (App _ (Val b) _)) | a > b = False
 -- All sub-expressions must also be valid.
 validExpr (App _ l r) = validExpr l && validExpr r
 
