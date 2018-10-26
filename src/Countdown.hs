@@ -1,6 +1,6 @@
 module Countdown where
 
-data Op = Add | Sub | Mul | Div
+data Op = Add | Sub | Mul | Div deriving Eq
 
 instance Show Op where
   show Add = "+"
@@ -12,16 +12,37 @@ data Expr = Val Int | App Op Expr Expr
 
 instance Show Expr where
   show (Val n)     = show n
-  show (App o l r) = brak l ++ show o ++ brak r
+  show (App o l r) = opShow o l ++ show o ++ opShow o r
                      where
-                       brak (Val n) = show n
-                       brak e       = "(" ++ show e ++ ")"
+                       opShow _       v@(Val _)           = show v
+                       opShow outerOp e@(App innerOp _ _) = if innerOp /= outerOp
+                                                            then "(" ++ show e ++ ")"
+                                                            else show e
 
 valid :: Op -> Int -> Int -> Bool
-valid Add x y = x <= y
+valid Add _ _ = True
 valid Sub x y = x > y
-valid Mul x y = x /= 1 && y /= 1 && x <= y
+valid Mul x y = x /= 1 && y /= 1
 valid Div x y = y /= 1 && x `mod` y == 0
+
+validExpr :: Expr -> Bool
+validExpr (Val _) = True
+-- No (e + 1), instead do (1 + e).
+validExpr (App Add (App _ _ _) (Val _)) = False
+validExpr (App Mul (App _ _ _) (Val _)) = False
+-- No ((1 + 2) + e) or (e + (1 + 2)), instead do (1 + (2 + e)).
+validExpr (App Add (App Add _ _) (App _ _ _)) = False
+validExpr (App Mul (App Mul _ _) (App _ _ _)) = False
+validExpr (App Add (App _ _ _) (App Add _ _)) = False
+validExpr (App Mul (App _ _ _) (App Mul _ _)) = False
+-- Smallest to largest for associative functions.
+validExpr (App Add (Val l) (Val r)) | l > r = False
+validExpr (App Mul (Val l) (Val r)) | l > r = False
+validExpr (App Add (Val a) (App Add (Val b) _)) | a > b = False
+validExpr (App Mul (Val a) (App Mul (Val b) _)) | a > b = False
+-- All sub-expressions must also be valid.
+validExpr (App _ l r) = validExpr l && validExpr r
+
 
 apply :: Op -> Int -> Int -> Int
 apply Add x y = x + y
@@ -79,4 +100,4 @@ solution e ns n =
   elem (values e) (choices ns) && eval e == [n]
 
 solutions :: [Int] -> Int -> [Expr]
-solutions ns n = [e | ns' <- choices ns, e <- exprs ns', eval e == [n]]
+solutions ns n = [e | ns' <- choices ns, e <- exprs ns', eval e == [n], validExpr e]
