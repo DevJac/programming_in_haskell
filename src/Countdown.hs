@@ -1,4 +1,5 @@
 module Countdown where
+import Data.List
 
 data Op = Add | Sub | Mul | Div deriving Eq
 
@@ -8,7 +9,7 @@ instance Show Op where
   show Mul = "*"
   show Div = "/"
 
-data Expr = Val Int | App Op Expr Expr
+data Expr = Val Int | App Op Expr Expr deriving Eq
 
 instance Show Expr where
   show (Val n)     = show n
@@ -25,27 +26,29 @@ valid Sub x y = x > y
 valid Mul x y = x /= 1 && y /= 1
 valid Div x y = y /= 1 && x `mod` y == 0
 
--- I'm not super confident this normalizes every equation form.
-validExpr :: Expr -> Bool
-validExpr (Val _) = True
--- No (e + 1), instead do (1 + e).
-validExpr (App Add (App _ _ _) (Val _)) = False
-validExpr (App Mul (App _ _ _) (Val _)) = False
--- No ((1 + 2) + e) or (e + (1 + 2)), instead do (1 + (2 + e)).
-validExpr (App Add (App Add _ _) (App _ _ _)) = False
-validExpr (App Mul (App Mul _ _) (App _ _ _)) = False
-validExpr (App Add (App _ _ _) (App Add _ _)) = False
-validExpr (App Mul (App _ _ _) (App Mul _ _)) = False
--- Smallest to largest for associative functions.
-validExpr (App Add (Val l) (Val r)) | l > r = False
-validExpr (App Mul (Val l) (Val r)) | l > r = False
-validExpr (App Add (Val a) (App Add (Val b) _)) | a > b = False
-validExpr (App Mul (Val a) (App Mul (Val b) _)) | a > b = False
-validExpr (App Add (App _ (Val a) _) (App _ (Val b) _)) | a > b = False
-validExpr (App Mul (App _ (Val a) _) (App _ (Val b) _)) | a > b = False
--- All sub-expressions must also be valid.
-validExpr (App _ l r) = validExpr l && validExpr r
+rewrite :: Expr -> Expr
+rewrite = rewrite' True
 
+rewrite' :: Bool -> Expr -> Expr
+-- Simple case
+rewrite' _ (Val n) = (Val n)
+-- Add rules
+rewrite' c (App Add (Val l) (Val r)) | l > r = rewrite' c (App Add (Val r) (Val l))
+rewrite' c (App Add l@(App _ _ _) r@(Val _)) = rewrite' c (App Add (rewrite' c r) (rewrite' c l))
+rewrite' c (App Add (Val l) (App Add (Val r) e)) | l > r = rewrite' c (App Add (Val r) (App Add (Val l) (rewrite' c e)))
+rewrite' c (App Add (Val l) (App Sub (Val r) e)) = rewrite' c (App Sub (App Add (Val l) (Val r)) (rewrite' c e))
+rewrite' c (App Add (App Add a b) r) = rewrite' c (App Add (rewrite' c a) (App Add (rewrite' c b) (rewrite' c r)))
+rewrite' c (App Add l@(App _notAdd _ _) r@(App Add _ _)) = rewrite' c (App Add (rewrite' c r) (rewrite' c l))
+-- Mul rules
+rewrite' c (App Mul (Val l) (Val r)) | l > r = rewrite' c (App Mul (Val r) (Val l))
+rewrite' c (App Mul l@(App _ _ _) r@(Val _)) = rewrite' c (App Mul (rewrite' c r) (rewrite' c l))
+rewrite' c (App Mul (Val l) (App Mul (Val r) e)) | l > r = rewrite' c (App Mul (Val r) (App Mul (Val l) (rewrite' c e)))
+rewrite' c (App Mul (Val l) (App Div (Val r) e)) = rewrite' c (App Div (App Mul (Val l) (Val r)) (rewrite' c e))
+rewrite' c (App Mul (App Mul a b) r) = rewrite' c (App Mul (rewrite' c a) (App Mul (rewrite' c b) (rewrite' c r)))
+rewrite' c (App Mul l@(App _notAddOrMul _ _) r@(App Mul _ _)) = rewrite' c (App Mul (rewrite' c r) (rewrite' c l))
+-- The rest
+rewrite' True (App o l r) = rewrite' False (App o (rewrite' True l) (rewrite' True r))
+rewrite' False e = e
 
 apply :: Op -> Int -> Int -> Int
 apply Add x y = x + y
@@ -103,4 +106,4 @@ solution e ns n =
   elem (values e) (choices ns) && eval e == [n]
 
 solutions :: [Int] -> Int -> [Expr]
-solutions ns n = [e | ns' <- choices ns, e <- exprs ns', eval e == [n], validExpr e]
+solutions ns n = nub [rewrite e | ns' <- choices ns, e <- exprs ns', eval e == [n]]
