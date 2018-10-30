@@ -4,6 +4,7 @@ import Data.List
 data Op = Add | Sub | Mul | Div deriving (Eq, Ord)
 
 instance Show Op where
+  show :: Op -> String
   show Add = "+"
   show Sub = "-"
   show Mul = "*"

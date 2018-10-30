@@ -18,6 +18,7 @@ executable programming-in-haskell-book
                         -fno-warn-missing-signatures
                         -fno-warn-partial-type-signatures
   default-extensions:   BangPatterns
+                        InstanceSigs
                         LambdaCase
                         MultiWayIf
                         NoMonomorphismRestriction
