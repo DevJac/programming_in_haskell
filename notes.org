@@ -105,3 +105,5 @@ Implement the runoff voting algorithm and compare with the implementation in cha
 Maybe even a red-black tree? I've heard they're difficult to implement.
 ** Tautology checker
 After I learn a parsing library, implement a tautology checker which can parse nicely formatted propositions and determine if they are tautologies.
+** Rewrite systems
+Rewriting seems like a deep an interesting topic. It might be worth studying.
