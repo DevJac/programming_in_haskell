@@ -1,7 +1,7 @@
 module Countdown where
 import Data.List
 
-data Op = Add | Sub | Mul | Div deriving Eq
+data Op = Add | Sub | Mul | Div deriving (Eq, Ord)
 
 instance Show Op where
   show Add = "+"
@@ -9,7 +9,7 @@ instance Show Op where
   show Mul = "*"
   show Div = "/"
 
-data Expr = Val Int | App Op Expr Expr deriving Eq
+data Expr = Val Int | App Op Expr Expr deriving (Eq, Ord)
 
 instance Show Expr where
   show (Val n)     = show n
@@ -30,37 +30,41 @@ rewrite :: Expr -> Expr
 -- Simple case
 rewrite (Val n) = (Val n)
 -- Add rules
-rewrite (App Add (Val l) (Val r)) | l > r = rewrite (App Add (Val r) (Val l))
 rewrite (App Add l@(App _ _ _) r@(Val _)) = rewrite (App Add (rewrite r) (rewrite l))
 rewrite (App Add (Val l) (App Add (Val r) e)) | l > r = rewrite (App Add (Val r) (App Add (Val l) (rewrite e)))
-rewrite (App Add (Val l) (App Sub (Val r) e)) = rewrite (App Sub (App Add (Val l) (Val r)) (rewrite e))
+rewrite (App Add (Val l) (App Sub r e)) = rewrite (App Sub (App Add (Val l) (rewrite r)) (rewrite e))
 rewrite (App Add (App Add a b) r) = rewrite (App Add (rewrite a) (App Add (rewrite b) (rewrite r)))
 rewrite (App Add l@(App _notAdd _ _) r@(App Add _ _)) = rewrite (App Add (rewrite r) (rewrite l))
+rewrite (App Add l r) | l > r = rewrite (App Add (rewrite r) (rewrite l))
 -- Mul rules
-rewrite (App Mul (Val l) (Val r)) | l > r = rewrite (App Mul (Val r) (Val l))
 rewrite (App Mul l@(App _ _ _) r@(Val _)) = rewrite (App Mul (rewrite r) (rewrite l))
 rewrite (App Mul (Val l) (App Mul (Val r) e)) | l > r = rewrite (App Mul (Val r) (App Mul (Val l) (rewrite e)))
-rewrite (App Mul (Val l) (App Div (Val r) e)) = rewrite (App Div (App Mul (Val l) (Val r)) (rewrite e))
+rewrite (App Mul (Val l) (App Div r e)) = rewrite (App Div (App Mul (Val l) (rewrite r)) (rewrite e))
 rewrite (App Mul (App Mul a b) r) = rewrite (App Mul (rewrite a) (App Mul (rewrite b) (rewrite r)))
 rewrite (App Mul l@(App _notAddOrMul _ _) r@(App Mul _ _)) = rewrite (App Mul (rewrite r) (rewrite l))
+rewrite (App Mul l r) | l > r = rewrite (App Mul (rewrite r) (rewrite l))
 -- The rest
 rewrite e@(App o l r) | needsRewrite e = rewrite (App o (rewrite l) (rewrite r))
                       | otherwise      = e
 
 needsRewrite :: Expr -> Bool
+-- Simple case
 needsRewrite (Val _) = False
-needsRewrite (App Add (Val l) (Val r)) | l > r = True
+-- Add rules
 needsRewrite (App Add (App _ _ _) (Val _)) = True
 needsRewrite (App Add (Val l) (App Add (Val r) _)) | l > r = True
-needsRewrite (App Add (Val _) (App Sub (Val _) _)) = True
+needsRewrite (App Add (Val _) (App Sub _ _)) = True
 needsRewrite (App Add (App Add _ _) _) = True
 needsRewrite (App Add (App _notAdd _ _) (App Add _ _)) = True
-needsRewrite (App Mul (Val l) (Val r)) | l > r = True
+needsRewrite (App Add l r) | l > r = True
+-- Mul rules
 needsRewrite (App Mul (App _ _ _) (Val _)) = True
 needsRewrite (App Mul (Val l) (App Mul (Val r) _)) | l > r = True
-needsRewrite (App Mul (Val _) (App Div (Val _) _)) = True
+needsRewrite (App Mul (Val _) (App Div _ _)) = True
 needsRewrite (App Mul (App Mul _ _) _) = True
 needsRewrite (App Mul (App _notAddOrMul _ _) (App Mul _ _)) = True
+needsRewrite (App Mul l r) | l > r = True
+-- The rest
 needsRewrite (App _ l r) = needsRewrite l || needsRewrite r
 
 apply :: Op -> Int -> Int -> Int
