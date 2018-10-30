@@ -27,28 +27,41 @@ valid Mul x y = x /= 1 && y /= 1
 valid Div x y = y /= 1 && x `mod` y == 0
 
 rewrite :: Expr -> Expr
-rewrite = rewrite' True
-
-rewrite' :: Bool -> Expr -> Expr
 -- Simple case
-rewrite' _ (Val n) = (Val n)
+rewrite (Val n) = (Val n)
 -- Add rules
-rewrite' c (App Add (Val l) (Val r)) | l > r = rewrite' c (App Add (Val r) (Val l))
-rewrite' c (App Add l@(App _ _ _) r@(Val _)) = rewrite' c (App Add (rewrite' c r) (rewrite' c l))
-rewrite' c (App Add (Val l) (App Add (Val r) e)) | l > r = rewrite' c (App Add (Val r) (App Add (Val l) (rewrite' c e)))
-rewrite' c (App Add (Val l) (App Sub (Val r) e)) = rewrite' c (App Sub (App Add (Val l) (Val r)) (rewrite' c e))
-rewrite' c (App Add (App Add a b) r) = rewrite' c (App Add (rewrite' c a) (App Add (rewrite' c b) (rewrite' c r)))
-rewrite' c (App Add l@(App _notAdd _ _) r@(App Add _ _)) = rewrite' c (App Add (rewrite' c r) (rewrite' c l))
+rewrite (App Add (Val l) (Val r)) | l > r = rewrite (App Add (Val r) (Val l))
+rewrite (App Add l@(App _ _ _) r@(Val _)) = rewrite (App Add (rewrite r) (rewrite l))
+rewrite (App Add (Val l) (App Add (Val r) e)) | l > r = rewrite (App Add (Val r) (App Add (Val l) (rewrite e)))
+rewrite (App Add (Val l) (App Sub (Val r) e)) = rewrite (App Sub (App Add (Val l) (Val r)) (rewrite e))
+rewrite (App Add (App Add a b) r) = rewrite (App Add (rewrite a) (App Add (rewrite b) (rewrite r)))
+rewrite (App Add l@(App _notAdd _ _) r@(App Add _ _)) = rewrite (App Add (rewrite r) (rewrite l))
 -- Mul rules
-rewrite' c (App Mul (Val l) (Val r)) | l > r = rewrite' c (App Mul (Val r) (Val l))
-rewrite' c (App Mul l@(App _ _ _) r@(Val _)) = rewrite' c (App Mul (rewrite' c r) (rewrite' c l))
-rewrite' c (App Mul (Val l) (App Mul (Val r) e)) | l > r = rewrite' c (App Mul (Val r) (App Mul (Val l) (rewrite' c e)))
-rewrite' c (App Mul (Val l) (App Div (Val r) e)) = rewrite' c (App Div (App Mul (Val l) (Val r)) (rewrite' c e))
-rewrite' c (App Mul (App Mul a b) r) = rewrite' c (App Mul (rewrite' c a) (App Mul (rewrite' c b) (rewrite' c r)))
-rewrite' c (App Mul l@(App _notAddOrMul _ _) r@(App Mul _ _)) = rewrite' c (App Mul (rewrite' c r) (rewrite' c l))
+rewrite (App Mul (Val l) (Val r)) | l > r = rewrite (App Mul (Val r) (Val l))
+rewrite (App Mul l@(App _ _ _) r@(Val _)) = rewrite (App Mul (rewrite r) (rewrite l))
+rewrite (App Mul (Val l) (App Mul (Val r) e)) | l > r = rewrite (App Mul (Val r) (App Mul (Val l) (rewrite e)))
+rewrite (App Mul (Val l) (App Div (Val r) e)) = rewrite (App Div (App Mul (Val l) (Val r)) (rewrite e))
+rewrite (App Mul (App Mul a b) r) = rewrite (App Mul (rewrite a) (App Mul (rewrite b) (rewrite r)))
+rewrite (App Mul l@(App _notAddOrMul _ _) r@(App Mul _ _)) = rewrite (App Mul (rewrite r) (rewrite l))
 -- The rest
-rewrite' True (App o l r) = rewrite' False (App o (rewrite' True l) (rewrite' True r))
-rewrite' False e = e
+rewrite e@(App o l r) | needsRewrite e = rewrite (App o (rewrite l) (rewrite r))
+                      | otherwise      = e
+
+needsRewrite :: Expr -> Bool
+needsRewrite (Val _) = False
+needsRewrite (App Add (Val l) (Val r)) | l > r = True
+needsRewrite (App Add (App _ _ _) (Val _)) = True
+needsRewrite (App Add (Val l) (App Add (Val r) _)) | l > r = True
+needsRewrite (App Add (Val _) (App Sub (Val _) _)) = True
+needsRewrite (App Add (App Add _ _) _) = True
+needsRewrite (App Add (App _notAdd _ _) (App Add _ _)) = True
+needsRewrite (App Mul (Val l) (Val r)) | l > r = True
+needsRewrite (App Mul (App _ _ _) (Val _)) = True
+needsRewrite (App Mul (Val l) (App Mul (Val r) _)) | l > r = True
+needsRewrite (App Mul (Val _) (App Div (Val _) _)) = True
+needsRewrite (App Mul (App Mul _ _) _) = True
+needsRewrite (App Mul (App _notAddOrMul _ _) (App Mul _ _)) = True
+needsRewrite (App _ l r) = needsRewrite l || needsRewrite r
 
 apply :: Op -> Int -> Int -> Int
 apply Add x y = x + y
