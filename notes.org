@@ -147,6 +147,18 @@ forever :: f a -> f b
 when :: Bool -> f () -> f ()  -- opposite is unless
 join :: m (m a) -> m a
 mfilter :: (a -> Bool) -> m a -> m a
+** typeclass instance syntax
+data Maybe a = Nothing | Just a
+
+class Functor f where
+    fmap :: (a -> b) -> f a -> f b
+
+instance Functor Maybe where
+    fmap :: (a -> b) -> Maybe a -> Maybe b
+    fmap _ Nothing  = Nothing
+    fmap g (Just x) = Just (g x)
+
+Notice that you do "instance Functor Maybe", and not "instance Functor Maybe a".
 * Project Ideas
 ** Solve substitution ciphers
 This should be possible using letter frequencies and a dictionary.
