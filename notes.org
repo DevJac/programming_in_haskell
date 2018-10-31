@@ -94,6 +94,31 @@ type Assoc k v = [(k, v)]
 Data declarations can be parameterized:
 
 data List a = Nil | Cons a (List a)
+** functor, applicative functor, and monad
+*** functor
+fmap :: (a -> b) -> f a -> f b
+
+fmap applies an outside function inside the functor.
+*** applicative functor
+pure :: a -> f a
+(<*>) :: f (a -> b) -> f a -> f b
+
+Notice how similar normal function application (a -> b) -> a -> b and (<*>) are. They have the same structure; (<*>) is function application inside a functor. This allows the surrounding functor to alter the nature of function application.
+*** monad
+Consider a function like safediv :: Int -> Int -> Maybe Int that does safe division and returns Nothing if the divisor is zero. This is a reasonable function, and its more general form is (a -> f b). This doesn't work in an applicative functor, look at the difference:
+
+(<*>) :: f (a ->   b) -> f a -> f b
+(???) :: f (a -> f b) -> f a -> f b
+
+The function being applied doesn't quite fit entirely inside the functor: (a -> b) fits, but (a -> f b) is sort of "poking out" with f b as its result. In this case we need a monad.
+
+If we were to try using (<*>) in the above case, we'd have f (a -> f b) -> f a -> f (f b) with f (f b) as our result. We could then use join :: f (f b) -> f b to "squish" the result back into the desired f b shape. Monads can be defined in terms of join.
+
+However, in Haskell monads are defined in terms of bind, which is an alternative way of defining the same thing:
+
+(>>=) :: f a -> (a -> f b) -> f b
+
+With monads we have a place for safediv and other (a -> f b) functions.
 * Project Ideas
 ** Solve substitution ciphers
 This should be possible using letter frequencies and a dictionary.
