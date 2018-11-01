@@ -190,19 +190,19 @@ A good solid example is let t be a list, and f be a Maybe.
 ** foldable is crushable
 It's arguable that a "fold" should be called a "crush". Folding and crushing are both memorable mental images, so it's worth keeping both in mind. (Reference: page 210)
 * Project Ideas
-** Solve substitution ciphers
+** solve substitution ciphers
 This should be possible using letter frequencies and a dictionary.
-** Visualize sorting algorithms
+** visualize sorting algorithms
 Once I've finished my raylib bindings, use it to visualize different sorting algorithms.
-** Runoff voting
+** runoff voting
 Implement the runoff voting algorithm and compare with the implementation in chapter 7.
-** Balanced tree
+** balanced tree
 Maybe even a red-black tree? I've heard they're difficult to implement.
-** Tautology checker
+** tautology checker
 After I learn a parsing library, implement a tautology checker which can parse nicely formatted propositions and determine if they are tautologies.
-** Rewrite systems
+** rewrite systems
 Rewriting seems like a deep an interesting topic. It might be worth studying.
-** Grammars
+** grammars
 Construction grammars seems like a deep topic. Chapter 13 provides some good exercises to get started with.
 ** typeclass cheatsheet
 Create a cheatsheet of common functions related to Functor, Applicative, Monad, Alternative, MonadPlus, Monoid, Foldable, and Traversable.
