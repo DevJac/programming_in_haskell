@@ -121,7 +121,7 @@ integer = token int
 symbol :: String -> Parser String
 symbol = token . string
 
--- list may not work as expected with parsers which consume commas (,).
+-- list may not work as expected with parsers that consume commas (,).
 list :: Parser a -> Parser [a]
 list p = do _ <- symbol "["
             n <- p
