@@ -1,3 +1,5 @@
+* About
+These are personal notes I took while reading through Programming in Haskell, Second Edition by Graham Hutton.
 * GHCI
 ** :set examples
 *** :set -Wno-type-defaults
@@ -159,6 +161,34 @@ instance Functor Maybe where
     fmap g (Just x) = Just (g x)
 
 Notice that you do "instance Functor Maybe", and not "instance Functor Maybe a".
+** assume the types check
+Earlier I was wondering how Maybe could be an instance of Show. I was confused because Maybe x is not a complete type, and whether it can be shown or not depends on what type x is, which lead me to question how you could write an instance Show Maybe when the full type of that maybe is not known.
+
+I now realize that when writing the "body" of a function, you can assume all the types check. Thus you can write something like:
+
+data MyMaybe a = Nope | A a
+
+instance Show a => Show (MyMaybe a) where
+  show :: Show a => MyMaybe a -> String
+  show Nope = "Nope"
+  show (A a) = "A (" ++ show a ++ ")"
+
+Just as the body of any function determines its type and class constraints, so does the body of the Show instance above determine the class constraints.
+** foldable and traversable
+Foldable indicates the ability of a type to be "folded" down into a simpler or singular value. This implies the type is a "container" of sorts.
+
+Functor indicates the ability to map a function over a type.
+
+Applicative indicates that a type can provide a surrounding context which may alter the nature of function application.
+
+Traversable is a combination of all the above, or at least involves all of the above. It's probably best explained with it's class definition:
+
+class (Functor t, Foldable t) => Traversable t where
+    traverse :: Applicative f => (a -> f b) -> t a -> f (t a)
+
+A good solid example is let t be a list, and f be a Maybe.
+** foldable is crushable
+It's arguable that a "fold" should be called a "crush". Folding and crushing are both memorable mental images, so it's worth keeping both in mind. (Reference: page 210)
 * Project Ideas
 ** Solve substitution ciphers
 This should be possible using letter frequencies and a dictionary.
@@ -172,3 +202,7 @@ Maybe even a red-black tree? I've heard they're difficult to implement.
 After I learn a parsing library, implement a tautology checker which can parse nicely formatted propositions and determine if they are tautologies.
 ** Rewrite systems
 Rewriting seems like a deep an interesting topic. It might be worth studying.
+** Grammars
+Construction grammars seems like a deep topic. Chapter 13 provides some good exercises to get started with.
+** typeclass cheatsheet
+Create a cheatsheet of common functions related to Functor, Applicative, Monad, Alternative, MonadPlus, Monoid, Foldable, and Traversable.
